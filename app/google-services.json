@@ -1,0 +1,42 @@
+{
+  "project_info": {
+    "project_number": "945232229379",
+    "firebase_url": "https://gardensmagiceye.firebaseio.com",
+    "project_id": "gardensmagiceye",
+    "storage_bucket": "gardensmagiceye.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:945232229379:android:b4fef8524f419ddc",
+        "android_client_info": {
+          "package_name": "com.example.lcvf.gardensmagiceye"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "945232229379-50aia3v0r652kq275c56v9e1itsp0tdp.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDst475lqmnamOXAtHRf6ihgk5nVCyC4ng"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 1,
+          "other_platform_oauth_client": []
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
