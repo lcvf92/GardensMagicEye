@@ -10,20 +10,29 @@ import android.support.v7.app.ActionBarDrawerToggle
 import android.support.v7.app.AppCompatActivity
 import android.view.Menu
 import android.view.MenuItem
+import android.view.View
+import android.widget.TextView
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.database.*
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.app_bar_main.*
 
 class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelectedListener {
 
+    //Firebase references
+    private var mDatabaseReference: DatabaseReference? = null
+    private var mDatabase: FirebaseDatabase? = null
+    private var mAuth: FirebaseAuth? = null
+    //UI elements
+    private var tvFirstName: TextView? = null
+    private var tvLastName: TextView? = null
+    private var tvEmail: TextView? = null
+    private var tvEmailVerifiied: TextView? = null
+
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-        setSupportActionBar(toolbar)
-
-        fab.setOnClickListener { view ->
-            Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                    .setAction("Action", null).show()
-        }
 
         val toggle = ActionBarDrawerToggle(
                 this, drawer_layout, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close)
@@ -31,7 +40,34 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         toggle.syncState()
 
         nav_view.setNavigationItemSelectedListener(this)
+
+        initialise()
     }
+    private fun initialise() {
+        mDatabase = FirebaseDatabase.getInstance()
+        mDatabaseReference = mDatabase!!.reference!!.child("Users")
+        mAuth = FirebaseAuth.getInstance()
+        tvFirstName = findViewById<View>(R.id.tv_first_name) as TextView
+        tvLastName = findViewById<View>(R.id.tv_last_name) as TextView
+        tvEmail = findViewById<View>(R.id.tv_email) as TextView
+        tvEmailVerifiied = findViewById<View>(R.id.tv_email_verifiied) as TextView
+    }
+
+    override fun onStart() {
+        super.onStart()
+        val mUser = mAuth!!.currentUser
+        val mUserReference = mDatabaseReference!!.child(mUser!!.uid)
+        tvEmail!!.text = mUser.email
+        tvEmailVerifiied!!.text = mUser.isEmailVerified.toString()
+        mUserReference.addValueEventListener(object : ValueEventListener {
+            override fun onDataChange(snapshot: DataSnapshot) {
+                tvFirstName!!.text = snapshot.child("firstName").value as String
+                tvLastName!!.text = snapshot.child("lastName").value as String
+            }
+            override fun onCancelled(databaseError: DatabaseError) {}
+        })
+    }
+
 
     override fun onBackPressed() {
         if (drawer_layout.isDrawerOpen(GravityCompat.START)) {
@@ -76,7 +112,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
             }
             R.id.nav_send -> {
-
+                mAuth?.signOut()
             }
         }
 

@@ -20,4 +20,18 @@
     <string name="nav_header_subtitle">android.studio@android.com</string>
     <string name="nav_header_desc">Navigation header</string>
     <string name="action_settings">Settings</string>
+    <string name="title_activity_create_account">CreateAccountActivity</string>
+
+    <string name="first_name">Nombre</string>
+    <string name="last_name">Apellido</string>
+    <string name="email">E-mail</string>
+    <string name="password">Contraseña</string>
+    <string name="create_account">Crear Cuenta</string>
+
+    <string name="etEmail">E-mail</string>
+    <string name="etPassword">Contraseña</string>
+    <string name="login_title">Ingresar</string>
+    <string name="create_act">Crear Cuenta</string>
+
+    <string name="send_password_reset_email">Envíar contraseña al correo</string>
 </resources>

@@ -1,14 +1,16 @@
 package com.example.lcvf.gardensmagiceye
 
+import android.app.ProgressDialog
 import android.content.Intent
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
-import android.text.Editable
 import android.text.TextUtils
+import android.util.Log
 import android.view.View
+import android.widget.Button
+import android.widget.EditText
+import android.widget.TextView
 import android.widget.Toast
-import com.google.android.gms.tasks.Task
-import com.google.firebase.auth.AuthResult
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.FirebaseDatabase
@@ -21,48 +23,74 @@ class LoginActivity : AppCompatActivity() {
     /**
      * Keep track of the login task to ensure we can cancel it if requested.
      */
-    private lateinit var databaseReference:DatabaseReference
-    private lateinit var database:FirebaseDatabase
-    private lateinit var auth:FirebaseAuth
+    private val TAG = "LoginActivity"
+    //global variables
+    private var email: String? = null
+    private var password: String? = null
+    //UI elements
+    private var tvForgotPassword: TextView? = null
+    private var etEmail: EditText? = null
+    private var etPassword: EditText? = null
+    private var btnLogin: Button? = null
+    private var btnCreateAccount: Button? = null
+    private var mProgressBar: ProgressDialog? = null
+    //Firebase references
+    private var mAuth: FirebaseAuth? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_login)
 
-        //set Instead FireBase
-        auth = FirebaseAuth.getInstance()
-        database = FirebaseDatabase.getInstance()
-        databaseReference = database.reference.child("User")
+        initialise()
+    }
 
+    private fun initialise() {
+        tvForgotPassword = findViewById<View>(R.id.tv_forgot_password) as TextView
+        etEmail = findViewById<View>(R.id.et_email) as EditText
+        etPassword = findViewById<View>(R.id.et_password) as EditText
+        btnLogin = findViewById<View>(R.id.btn_login) as Button
+        btnCreateAccount = findViewById<View>(R.id.btn_register_account) as Button
+        mProgressBar = ProgressDialog(this)
+        mAuth = FirebaseAuth.getInstance()
+        tvForgotPassword!!
+                .setOnClickListener { startActivity(Intent(this@LoginActivity,
+                        ForgotPasswordActivity::class.java)) }
+        btnCreateAccount!!
+                .setOnClickListener { startActivity(Intent(this@LoginActivity,
+                        CreateAccountActivity::class.java)) }
+        btnLogin!!.setOnClickListener { loginUser() }
+    }
 
-        email_sign_in_button.setOnClickListener {
-            loginUser()
+    private fun loginUser() {
+        email = etEmail?.text.toString()
+        password = etPassword?.text.toString()
+        if (!TextUtils.isEmpty(email) && !TextUtils.isEmpty(password)) {
+            mProgressBar!!.setMessage("Registrando Usuario...")
+            mProgressBar!!.show()
+            Log.d(TAG, "Logging in user.")
+            mAuth!!.signInWithEmailAndPassword(email!!, password!!)
+                    .addOnCompleteListener(this) { task ->
+                        mProgressBar!!.hide()
+                        if (task.isSuccessful) {
+                            // Sign in success, update UI with signed-in user's information
+                            Log.d(TAG, "signInWithEmail:success")
+                            updateUI()
+                        } else {
+                            // If sign in fails, display a message to the user.
+                            Log.e(TAG, "signInWithEmail:failure", task.exception)
+                            Toast.makeText(this@LoginActivity, "Autentificación fallida.",
+                                    Toast.LENGTH_SHORT).show()
+                        }
+                    }
+        } else {
+            Toast.makeText(this, "Faltan campos por completar.", Toast.LENGTH_SHORT).show()
         }
     }
 
-    fun loginUser(){
-
-        val email:String? = email.text.toString()
-        val password:String?=password.text.toString()
-
-        if(!TextUtils.isEmpty(email) && !TextUtils.isEmpty(password)){
-            login_progress.visibility = View.VISIBLE
-            auth.signInWithEmailAndPassword(email!!, password!!)
-                    .addOnCompleteListener {
-                        task ->
-                        if(task.isSuccessful){
-                            startActivity(Intent(applicationContext,MainActivity::class.java))
-                        }else{
-                            Toast.makeText(this, "Alguno de los parámetros son inválidos, favor intente nuevamente...", Toast.LENGTH_SHORT).show()
-                        }
-                        login_progress.visibility = View.GONE
-                    }
-        }else{
-            Toast.makeText(this, "Los campos no pueden ir vacios...", Toast.LENGTH_SHORT).show()
-        }
-
-
-
+    private fun updateUI() {
+        val intent = Intent(this@LoginActivity, MainActivity::class.java)
+        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
+        startActivity(intent)
     }
 
 }
